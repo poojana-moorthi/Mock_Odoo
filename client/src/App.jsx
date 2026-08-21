@@ -2,6 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import AdminDashboard from './AdminDashboard';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import ProductsPage from './pages/ProductsPage';
+import SalesPage from './pages/SalesPage';
+import PurchasePage from './pages/PurchasePage';
+import ManufacturingPage from './pages/ManufacturingPage';
+import InventoryPage from './pages/InventoryPage';
+import AuditLogsPage from './pages/AuditLogsPage';
+import UnauthorizedPage from './pages/UnauthorizedPage';
+import AdminUserListPage from './pages/AdminUserListPage';
+import AdminUserDetailPage from './pages/AdminUserDetailPage';
 import {
   Lock,
   Mail,
@@ -27,33 +38,28 @@ import {
 axios.defaults.baseURL = '';
 
 export default function App() {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [loadingUser, setLoadingUser] = useState(true);
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
+  );
+}
+
+function AppRoutes() {
+  const { currentUser, login, logout, role, loading } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Disable session persistence so the user is always taken to the login page first
-    localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
-    setCurrentUser(null);
-    setLoadingUser(false);
-  }, []);
-
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
-    setCurrentUser(null);
+    logout();
     navigate('/login');
   };
 
   const handleAuthSuccess = (user, token) => {
-    localStorage.setItem('token', token);
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    setCurrentUser(user);
+    login(user, token);
     navigate('/dashboard');
   };
 
-  if (loadingUser) {
+  if (loading) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0b0f19' }}>
         <div className="spinner"></div>
@@ -88,10 +94,14 @@ export default function App() {
         element={!currentUser ? <ResetPasswordView /> : <Navigate to="/dashboard" replace />} 
       />
       <Route 
+        path="/unauthorized" 
+        element={<UnauthorizedPage />} 
+      />
+      <Route 
         path="/dashboard" 
         element={
           currentUser ? (
-            currentUser.role_name === 'Administrator' || currentUser.role_name === 'Admin' ? (
+            role === 'Admin' ? (
               <AdminDashboard user={currentUser} onLogout={handleLogout} />
             ) : (
               <DashboardView user={currentUser} onLogout={handleLogout} />
@@ -100,6 +110,80 @@ export default function App() {
             <Navigate to="/login" replace />
           )
         } 
+      />
+
+      {/* Admin User Management Routes */}
+      <Route
+        path="/admin/users"
+        element={
+          <ProtectedRoute allowedRoles={['Admin']}>
+            <AdminUserListPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/users/:id"
+        element={
+          <ProtectedRoute allowedRoles={['Admin']}>
+            <AdminUserDetailPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Role Protected ERP Module Routes */}
+      <Route
+        path="/products"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'InventoryManager', 'BusinessOwner', 'SalesUser', 'PurchaseUser', 'ManufacturingUser']}>
+            <ProductsPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/sales"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'SalesUser', 'BusinessOwner']}>
+            <SalesPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/purchase"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'PurchaseUser', 'BusinessOwner']}>
+            <PurchasePage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/manufacturing"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'ManufacturingUser', 'BusinessOwner']}>
+            <ManufacturingPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/inventory"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'InventoryManager', 'BusinessOwner']}>
+            <InventoryPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/audit-logs"
+        element={
+          <ProtectedRoute allowedRoles={['Admin']}>
+            <AuditLogsPage />
+          </ProtectedRoute>
+        }
       />
     </Routes>
   );

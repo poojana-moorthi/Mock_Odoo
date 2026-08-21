@@ -7,6 +7,8 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const errorHandler = require('./middleware/errorMiddleware');
 const authRoutes = require('./routes/authRoutes');
+const erpRoutes = require('./routes/erpRoutes');
+const adminUserRoutes = require('./routes/adminUserRoutes');
 const runMigrations = require('./db/migrate');
 
 const app = express();
@@ -50,6 +52,12 @@ app.get('/api/health', (req, res) => {
 
 // Mount Authentication Routes
 app.use('/api/auth', authRoutes);
+
+// Mount Admin User Management Routes (Admin Role Only)
+app.use('/api/admin', adminUserRoutes);
+
+// Mount Module ERP Routes (RBAC Protected)
+app.use('/api', erpRoutes);
 
 // Centralized Error Handling Middleware
 app.use(errorHandler);

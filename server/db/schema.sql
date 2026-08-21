@@ -303,4 +303,115 @@ CREATE TABLE `audit_logs` (
   INDEX `idx_audit_entity` (`entity_type`, `entity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- -----------------------------------------------------------------------------
+-- 17. PERMISSION TEMPLATES TABLE
+-- -----------------------------------------------------------------------------
+DROP TABLE IF EXISTS `permission_templates`;
+CREATE TABLE `permission_templates` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `role` ENUM('Admin', 'User') NOT NULL,
+  `module` VARCHAR(50) NOT NULL,
+  `field_name` VARCHAR(50) NOT NULL,
+  `can_create` BOOLEAN NOT NULL DEFAULT TRUE,
+  `can_view` BOOLEAN NOT NULL DEFAULT TRUE,
+  `can_edit` BOOLEAN NOT NULL DEFAULT TRUE,
+  `can_delete` BOOLEAN NOT NULL DEFAULT TRUE,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY `uq_template_role_module_field` (`role`, `module`, `field_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------------------------------
+-- 18. USER FIELD PERMISSIONS TABLE
+-- -----------------------------------------------------------------------------
+DROP TABLE IF EXISTS `user_field_permissions`;
+CREATE TABLE `user_field_permissions` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT NOT NULL,
+  `module` VARCHAR(50) NOT NULL,
+  `field_name` VARCHAR(50) NOT NULL,
+  `can_create` BOOLEAN NOT NULL DEFAULT TRUE,
+  `can_view` BOOLEAN NOT NULL DEFAULT TRUE,
+  `can_edit` BOOLEAN NOT NULL DEFAULT TRUE,
+  `can_delete` BOOLEAN NOT NULL DEFAULT TRUE,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT `fk_ufp_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  UNIQUE KEY `uq_user_module_field` (`user_id`, `module`, `field_name`),
+  INDEX `idx_ufp_user_module` (`user_id`, `module`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Seed Default Permission Templates
+INSERT INTO `permission_templates` (`role`, `module`, `field_name`, `can_create`, `can_view`, `can_edit`, `can_delete`) VALUES
+('Admin', 'Sales', 'customer', true, true, true, true),
+('Admin', 'Sales', 'customer_address', true, true, true, true),
+('Admin', 'Sales', 'sales_person', true, true, true, true),
+('Admin', 'Sales', 'product', true, true, true, true),
+('Admin', 'Sales', 'ordered_quantity', true, true, true, true),
+('Admin', 'Sales', 'delivered_quantity', true, true, true, true),
+('Admin', 'Sales', 'sales_price', true, true, true, true),
+('Admin', 'Sales', 'status', true, true, true, true),
+('Admin', 'Sales', 'total', true, true, true, true),
+('Admin', 'Sales', 'creation_date', true, true, false, false),
+('User', 'Sales', 'customer', true, true, true, true),
+('User', 'Sales', 'customer_address', true, true, true, true),
+('User', 'Sales', 'sales_person', true, true, true, true),
+('User', 'Sales', 'product', true, true, true, true),
+('User', 'Sales', 'ordered_quantity', true, true, true, true),
+('User', 'Sales', 'delivered_quantity', true, true, true, true),
+('User', 'Sales', 'sales_price', true, true, true, true),
+('User', 'Sales', 'status', true, true, true, false),
+('User', 'Sales', 'total', true, true, false, true),
+('User', 'Sales', 'creation_date', false, true, false, false),
+
+('Admin', 'Purchase', 'vendor', true, true, true, true),
+('Admin', 'Purchase', 'vendor_address', true, true, true, true),
+('Admin', 'Purchase', 'responsible_person', true, true, true, true),
+('Admin', 'Purchase', 'product', true, true, true, true),
+('Admin', 'Purchase', 'ordered_quantity', true, true, true, true),
+('Admin', 'Purchase', 'received_quantity', true, true, true, true),
+('Admin', 'Purchase', 'cost_price', true, true, true, true),
+('Admin', 'Purchase', 'total', true, true, true, true),
+('Admin', 'Purchase', 'creation_date', true, true, false, false),
+('User', 'Purchase', 'vendor', true, true, true, true),
+('User', 'Purchase', 'vendor_address', true, true, true, true),
+('User', 'Purchase', 'responsible_person', true, true, true, true),
+('User', 'Purchase', 'product', true, true, true, true),
+('User', 'Purchase', 'ordered_quantity', true, true, true, true),
+('User', 'Purchase', 'received_quantity', true, true, true, true),
+('User', 'Purchase', 'cost_price', true, true, true, true),
+('User', 'Purchase', 'total', true, true, false, true),
+('User', 'Purchase', 'creation_date', false, true, false, false),
+
+('Admin', 'Manufacturing', 'product_to_manufacture', true, true, true, true),
+('Admin', 'Manufacturing', 'product_quantity', true, true, true, true),
+('Admin', 'Manufacturing', 'bom', true, true, true, true),
+('Admin', 'Manufacturing', 'responsible_person', true, true, true, true),
+('Admin', 'Manufacturing', 'finished_quantity', true, true, true, true),
+('Admin', 'Manufacturing', 'creation_date', true, true, false, false),
+('User', 'Manufacturing', 'product_to_manufacture', true, true, true, true),
+('User', 'Manufacturing', 'product_quantity', true, true, true, true),
+('User', 'Manufacturing', 'bom', true, true, true, true),
+('User', 'Manufacturing', 'responsible_person', true, true, true, true),
+('User', 'Manufacturing', 'finished_quantity', true, true, true, true),
+('User', 'Manufacturing', 'creation_date', false, true, false, false),
+
+('Admin', 'Product', 'product', true, true, true, true),
+('Admin', 'Product', 'sales_price', true, true, true, true),
+('Admin', 'Product', 'cost_price', true, true, true, true),
+('Admin', 'Product', 'on_hand_qty', true, true, true, true),
+('Admin', 'Product', 'free_to_use_qty', false, true, false, false),
+('Admin', 'Product', 'procure_on_demand', true, true, true, true),
+('Admin', 'Product', 'procurement_method', true, true, true, true),
+('Admin', 'Product', 'vendor', true, true, true, true),
+('Admin', 'Product', 'bill_of_materials', true, true, true, true),
+('User', 'Product', 'product', true, true, true, true),
+('User', 'Product', 'sales_price', true, true, true, true),
+('User', 'Product', 'cost_price', true, true, true, true),
+('User', 'Product', 'on_hand_qty', false, true, false, false),
+('User', 'Product', 'free_to_use_qty', false, true, false, false),
+('User', 'Product', 'procure_on_demand', false, true, true, true),
+('User', 'Product', 'procurement_method', false, true, true, true),
+('User', 'Product', 'vendor', true, true, true, true),
+('User', 'Product', 'bill_of_materials', true, true, true, true)
+ON DUPLICATE KEY UPDATE `can_create`=VALUES(`can_create`), `can_view`=VALUES(`can_view`), `can_edit`=VALUES(`can_edit`), `can_delete`=VALUES(`can_delete`);
+
 SET FOREIGN_KEY_CHECKS = 1;

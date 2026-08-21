@@ -59,3 +59,7 @@ exports.protect = async (req, res, next) => {
     return error(res, 'Not authorized, security validation failed', 401);
   }
 };
+
+const { requireRole } = require('./roleMiddleware');
+exports.requireRole = requireRole;
+

@@ -2,6 +2,7 @@ const pool = require('../config/db');
 const { hashPassword, comparePassword, validatePasswordComplexity } = require('../utils/password');
 const { generateToken } = require('../utils/jwt');
 const { success, error } = require('../utils/response');
+const { seedUserPermissionsFromTemplate } = require('../services/permissionService');
 const crypto = require('crypto');
 
 // Map departments to roles to match the DB seed schema
@@ -60,6 +61,9 @@ exports.adminSignup = async (req, res, next) => {
     );
 
     const userId = result.insertId;
+
+    // Seed default field-level permissions for Admin
+    await seedUserPermissionsFromTemplate(userId, 'Admin');
 
     // Create system audit log
     await pool.query(
@@ -139,6 +143,9 @@ exports.userSignup = async (req, res, next) => {
     );
 
     const userId = result.insertId;
+
+    // Seed default field-level permissions for User
+    await seedUserPermissionsFromTemplate(userId, 'User');
 
     // Create system audit log
     await pool.query(

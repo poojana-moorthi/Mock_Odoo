@@ -1,25 +1,51 @@
 const { error } = require('../utils/response');
 
 /**
- * Middleware to restrict route access by user role
- * @param {...string} allowedRoles Roles allowed to access the route
+ * Normalizes role strings to match canonical forms:
+ * Admin, SalesUser, PurchaseUser, ManufacturingUser, InventoryManager, BusinessOwner
  */
-exports.authorize = (...allowedRoles) => {
+const normalizeRole = (roleStr) => {
+  if (!roleStr) return '';
+  const cleaned = roleStr.replace(/\s+/g, '').toLowerCase();
+  if (cleaned === 'admin' || cleaned === 'administrator') return 'Admin';
+  if (cleaned === 'salesuser' || cleaned === 'sales') return 'SalesUser';
+  if (cleaned === 'purchaseuser' || cleaned === 'purchase') return 'PurchaseUser';
+  if (cleaned === 'manufacturinguser' || cleaned === 'manufacturing') return 'ManufacturingUser';
+  if (cleaned === 'inventorymanager' || cleaned === 'inventory') return 'InventoryManager';
+  if (cleaned === 'businessowner' || cleaned === 'owner') return 'BusinessOwner';
+  return roleStr;
+};
+
+/**
+ * Express middleware to enforce Role-Based Access Control (RBAC)
+ * @param  {...string} allowedRoles - List of allowed roles (e.g. 'Admin', 'SalesUser')
+ */
+exports.requireRole = (...allowedRoles) => {
+  const normalizedAllowed = allowedRoles.map(normalizeRole);
+
   return (req, res, next) => {
-    if (!req.user || !req.user.role_name) {
-      return error(res, 'Forbidden, no user access role found', 403);
+    if (!req.user) {
+      return error(res, 'Not authorized, user profile missing', 401);
     }
 
-    // Administrators bypass all role boundaries and have full system access
-    if (req.user.role_name === 'Admin') {
-      return next();
-    }
+    const userRole = normalizeRole(req.user.role_name || req.user.role);
 
-    // Check if user's role is in the list of allowed roles
-    if (!allowedRoles.includes(req.user.role_name)) {
+    // 1. Check if user's role is in allowed roles list
+    const isRoleAllowed = normalizedAllowed.includes(userRole);
+
+    if (!isRoleAllowed) {
       return error(
         res,
-        `Access denied. Your role (${req.user.role_name}) is not authorized to access this resource.`,
+        `Forbidden: Role "${req.user.role_name || userRole}" is not authorized to access this route`,
+        403
+      );
+    }
+
+    // 2. Special BusinessOwner Rule: Read-Only (GET) access only
+    if (userRole === 'BusinessOwner' && req.method !== 'GET') {
+      return error(
+        res,
+        'Forbidden: BusinessOwner has read-only access to module resources',
         403
       );
     }
@@ -27,3 +53,5 @@ exports.authorize = (...allowedRoles) => {
     next();
   };
 };
+
+exports.normalizeRole = normalizeRole;

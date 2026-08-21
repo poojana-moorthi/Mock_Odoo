@@ -4,6 +4,7 @@ import axios from 'axios';
 import AdminDashboard from './AdminDashboard';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import Sidebar from './components/Sidebar';
 import ProductsPage from './pages/ProductsPage';
 import SalesPage from './pages/SalesPage';
 import PurchasePage from './pages/PurchasePage';
@@ -1034,33 +1035,101 @@ function ResetPasswordView() {
    6. DASHBOARD VIEW (AUTHENTICATED)
    ========================================================================== */
 function DashboardView({ user, onLogout }) {
+  const navigate = useNavigate();
+  const { role, hasRole } = useAuth();
   const [systemLogs, setSystemLogs] = useState([]);
   
   useEffect(() => {
     const defaultLogs = [
-      { id: 1, action: 'SESSION_STARTED', details: `User session active for ${user.full_name}`, time: 'Just now' },
+      { id: 1, action: 'SESSION_STARTED', details: `User session active for ${user?.full_name || 'User'}`, time: 'Just now' },
       { id: 2, action: 'SECURITY_CHECK', details: 'JWT Signature verified successfully', time: '1m ago' },
-      { id: 3, action: 'ROLE_VALIDATED', details: `User type context matches role: ${user.role_name}`, time: '2m ago' }
+      { id: 3, action: 'ROLE_VALIDATED', details: `User type context matches role: ${role || user?.role_name}`, time: '2m ago' }
     ];
     setSystemLogs(defaultLogs);
-  }, [user]);
+  }, [user, role]);
 
   return (
-    <div className="dashboard-outer">
-      <div className="dashboard-wrapper">
-        <div className="dashboard-header">
+    <div className="erp-page-layout">
+      <Sidebar />
+
+      <main className="erp-page-content">
+        {/* Header Bar */}
+        <header className="page-header">
           <div>
-            <span className="user-badge">{user.role_name} Profile</span>
-            <h1 className="auth-title" style={{ marginTop: '0.5rem', marginBottom: 0, fontSize: '2rem', textAlign: 'left' }}>
-              Welcome back, {user.full_name}
+            <span className="page-breadcrumb">Workspace / Main Dashboard</span>
+            <h1 className="page-title">
+              Welcome back, {user?.full_name || 'Employee'}
             </h1>
           </div>
           <button className="btn-secondary" onClick={onLogout} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <LogOut size={16} /> Logout
           </button>
+        </header>
+
+        {/* Quick Module Navigation Cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
+          {hasRole('Admin', 'InventoryManager', 'BusinessOwner', 'SalesUser', 'PurchaseUser', 'ManufacturingUser') && (
+            <div 
+              className="panel-card" 
+              style={{ cursor: 'pointer', transition: 'transform 0.2s ease', borderLeft: '4px solid #4f46e5' }}
+              onClick={() => navigate('/products')}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: '#64748b' }}>CATALOG</span>
+                <Package size={22} style={{ color: '#4f46e5' }} />
+              </div>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.35rem' }}>Products</h3>
+              <p style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.5 }}>Manage product catalog, prices, and stock balances (MTS / MTO).</p>
+            </div>
+          )}
+
+          {hasRole('Admin', 'SalesUser', 'BusinessOwner') && (
+            <div 
+              className="panel-card" 
+              style={{ cursor: 'pointer', transition: 'transform 0.2s ease', borderLeft: '4px solid #059669' }}
+              onClick={() => navigate('/sales')}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: '#64748b' }}>DEMAND</span>
+                <ShoppingCart size={22} style={{ color: '#059669' }} />
+              </div>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.35rem' }}>Sales Orders</h3>
+              <p style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.5 }}>Manage customer orders, reservations, and dispatch statuses.</p>
+            </div>
+          )}
+
+          {hasRole('Admin', 'PurchaseUser', 'BusinessOwner') && (
+            <div 
+              className="panel-card" 
+              style={{ cursor: 'pointer', transition: 'transform 0.2s ease', borderLeft: '4px solid #d97706' }}
+              onClick={() => navigate('/purchase')}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: '#64748b' }}>REPLENISHMENT</span>
+                <Truck size={22} style={{ color: '#d97706' }} />
+              </div>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.35rem' }}>Purchase Orders</h3>
+              <p style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.5 }}>Manage vendor orders, cost prices, and inbound stock receipts.</p>
+            </div>
+          )}
+
+          {hasRole('Admin', 'ManufacturingUser', 'BusinessOwner') && (
+            <div 
+              className="panel-card" 
+              style={{ cursor: 'pointer', transition: 'transform 0.2s ease', borderLeft: '4px solid #2563eb' }}
+              onClick={() => navigate('/manufacturing')}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: '#64748b' }}>PRODUCTION</span>
+                <Factory size={22} style={{ color: '#2563eb' }} />
+              </div>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.35rem' }}>Manufacturing</h3>
+              <p style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.5 }}>Manage BoM structures, Manufacturing Orders, and Work Centers.</p>
+            </div>
+          )}
         </div>
 
-        <div className="grid-2col" style={{ marginTop: '2rem' }}>
+        <div className="grid-2col" style={{ marginTop: '1rem' }}>
           {/* User Details */}
           <div className="panel-card">
             <h3 className="panel-title">
@@ -1069,23 +1138,23 @@ function DashboardView({ user, onLogout }) {
             
             <div className="info-item">
               <span className="info-label">Full Name</span>
-              <span className="info-value">{user.full_name}</span>
+              <span className="info-value">{user?.full_name || 'User'}</span>
             </div>
             
             <div className="info-item">
               <span className="info-label">Email Context</span>
-              <span className="info-value">{user.email}</span>
+              <span className="info-value">{user?.email}</span>
             </div>
 
             <div className="info-item">
               <span className="info-label">Department</span>
-              <span className="info-value">{user.department || 'N/A'}</span>
+              <span className="info-value">{user?.department || 'N/A'}</span>
             </div>
 
             <div className="info-item">
-              <span className="info-label">Status</span>
-              <span className="info-value" style={{ color: user.status === 'Active' ? 'var(--success)' : 'var(--error)' }}>
-                ● {user.status}
+              <span className="info-label">Role Context</span>
+              <span className="info-value font-bold" style={{ color: '#4f46e5' }}>
+                {role || user?.role_name}
               </span>
             </div>
           </div>
@@ -1096,14 +1165,14 @@ function DashboardView({ user, onLogout }) {
               <Activity size={18} style={{ color: 'var(--primary)' }} /> Live Security Logs
             </h3>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem' }}>
               {systemLogs.map(log => (
                 <div 
                   key={log.id} 
                   style={{ 
-                    padding: '1rem', 
-                    background: 'rgba(0,0,0,0.02)', 
-                    border: '1px solid rgba(0,0,0,0.04)',
+                    padding: '0.85rem', 
+                    background: '#f8fafc', 
+                    border: '1px solid #e2e8f0',
                     borderRadius: '10px',
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -1111,14 +1180,14 @@ function DashboardView({ user, onLogout }) {
                   }}
                 >
                   <div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--primary)', letterSpacing: '0.05em' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#4f46e5', letterSpacing: '0.05em' }}>
                       {log.action}
                     </div>
-                    <div style={{ fontSize: '0.875rem', color: 'var(--text-dark)', marginTop: '0.25rem' }}>
+                    <div style={{ fontSize: '0.85rem', color: '#334155', marginTop: '0.2rem' }}>
                       {log.details}
                     </div>
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
                     {log.time}
                   </div>
                 </div>
@@ -1126,11 +1195,7 @@ function DashboardView({ user, onLogout }) {
             </div>
           </div>
         </div>
-      </div>
-
-      <footer style={{ textAlign: 'center', padding: '2.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-        © 2026 Shiv Furniture Works ERP. All systems operational.
-      </footer>
+      </main>
     </div>
   );
 }

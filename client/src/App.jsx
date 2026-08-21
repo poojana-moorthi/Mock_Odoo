@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import axios from 'axios';
+import AdminDashboard from './AdminDashboard';
 import {
   Lock,
   Mail,
@@ -88,7 +89,17 @@ export default function App() {
       />
       <Route 
         path="/dashboard" 
-        element={currentUser ? <DashboardView user={currentUser} onLogout={handleLogout} /> : <Navigate to="/login" replace />} 
+        element={
+          currentUser ? (
+            currentUser.role_name === 'Administrator' || currentUser.role_name === 'Admin' ? (
+              <AdminDashboard user={currentUser} onLogout={handleLogout} />
+            ) : (
+              <DashboardView user={currentUser} onLogout={handleLogout} />
+            )
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        } 
       />
     </Routes>
   );
@@ -767,7 +778,7 @@ function ForgotPasswordView() {
             <div>
               <div className="alert alert-success">
                 <CheckCircle2 size={16} style={{ flexShrink: 0 }} />
-                <div>Token generated! In production, this link is emailed. For mock purposes, click below:</div>
+                <div>Reset token generated successfully! Please click the link below to change your password.</div>
               </div>
 
               <div style={{ textAlign: 'center', marginTop: '2rem' }}>

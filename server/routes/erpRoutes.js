@@ -2,17 +2,24 @@ const express = require('express');
 const router = express.Router();
 const { protect, requireRole } = require('../middleware/authMiddleware');
 const erpController = require('../controllers/erpController');
+const productController = require('../controllers/productController');
 
 // All routes require JWT authentication
 router.use(protect);
 
 // 1. Products Module Routes
-// Admin, InventoryManager, BusinessOwner, SalesUser, PurchaseUser, ManufacturingUser (BusinessOwner is read-only via middleware)
 router.route('/products')
-  .get(requireRole('Admin', 'InventoryManager', 'BusinessOwner', 'SalesUser', 'PurchaseUser', 'ManufacturingUser'), erpController.getProducts)
-  .post(requireRole('Admin', 'InventoryManager'), erpController.createProduct)
-  .put(requireRole('Admin', 'InventoryManager'), erpController.updateProduct)
-  .delete(requireRole('Admin', 'InventoryManager'), erpController.deleteProduct);
+  .get(requireRole('Admin', 'InventoryManager', 'BusinessOwner', 'SalesUser', 'PurchaseUser', 'ManufacturingUser'), productController.getAllProducts)
+  .post(requireRole('Admin', 'InventoryManager'), productController.createProduct);
+
+router.route('/products/:id')
+  .get(requireRole('Admin', 'InventoryManager', 'BusinessOwner', 'SalesUser', 'PurchaseUser', 'ManufacturingUser'), productController.getProductById)
+  .put(requireRole('Admin', 'InventoryManager'), productController.updateProduct)
+  .delete(requireRole('Admin', 'InventoryManager'), productController.deleteProduct);
+
+// Helper Vendors Route for Product Form Vendor Dropdown
+router.route('/vendors')
+  .get(requireRole('Admin', 'InventoryManager', 'BusinessOwner', 'SalesUser', 'PurchaseUser', 'ManufacturingUser'), productController.getAllVendors);
 
 // 2. Sales Module Routes
 // Admin, SalesUser, BusinessOwner (read-only for BusinessOwner)

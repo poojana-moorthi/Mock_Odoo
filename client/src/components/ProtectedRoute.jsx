@@ -18,10 +18,10 @@ export default function ProtectedRoute({ allowedRoles, children }) {
   }
 
   if (allowedRoles && allowedRoles.length > 0) {
-    const normalizedAllowed = allowedRoles.map(r => r.replace(/\s+/g, '').toLowerCase());
-    const userRoleNormalized = role.replace(/\s+/g, '').toLowerCase();
+    const normalizedAllowed = allowedRoles.map(r => (r || '').replace(/\s+/g, '').toLowerCase());
+    const userRoleNormalized = (role || '').replace(/\s+/g, '').toLowerCase();
 
-    if (!normalizedAllowed.includes(userRoleNormalized)) {
+    if (!userRoleNormalized || !normalizedAllowed.includes(userRoleNormalized)) {
       return <Navigate to="/unauthorized" replace />;
     }
   }

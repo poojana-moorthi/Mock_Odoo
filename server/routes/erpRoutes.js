@@ -3,6 +3,7 @@ const router = express.Router();
 const { protect, requireRole } = require('../middleware/authMiddleware');
 const erpController = require('../controllers/erpController');
 const productController = require('../controllers/productController');
+const inventoryController = require('../controllers/inventoryController');
 
 // All routes require JWT authentication
 router.use(protect);
@@ -48,10 +49,13 @@ router.route('/manufacturing')
 // 5. Inventory Module Routes
 // Admin, InventoryManager, BusinessOwner (read-only for BusinessOwner)
 router.route('/inventory')
-  .get(requireRole('Admin', 'InventoryManager', 'BusinessOwner'), erpController.getInventory)
-  .post(requireRole('Admin', 'InventoryManager'), erpController.createInventory)
-  .put(requireRole('Admin', 'InventoryManager'), erpController.updateInventory)
-  .delete(requireRole('Admin', 'InventoryManager'), erpController.deleteInventory);
+  .get(requireRole('Admin', 'InventoryManager', 'BusinessOwner'), inventoryController.getInventoryOverview);
+
+router.route('/inventory/adjustment')
+  .post(requireRole('Admin', 'InventoryManager'), inventoryController.createManualAdjustment);
+
+router.route('/inventory/:productId/ledger')
+  .get(requireRole('Admin', 'InventoryManager', 'BusinessOwner'), inventoryController.getProductLedger);
 
 // 6. Audit Logs Routes
 // Admin ONLY

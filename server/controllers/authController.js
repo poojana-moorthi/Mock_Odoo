@@ -67,7 +67,7 @@ exports.adminSignup = async (req, res, next) => {
 
     // Create system audit log
     await pool.query(
-      'INSERT INTO audit_logs (user_id, action, entity_type, entity_id, new_value) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO audit_logs (user_id, action_type, entity_type, entity_id, new_value) VALUES (?, ?, ?, ?, ?)',
       [userId, 'ADMIN_SIGNUP', 'USER', userId, JSON.stringify({ email, role_id: 1 })]
     );
 
@@ -149,7 +149,7 @@ exports.userSignup = async (req, res, next) => {
 
     // Create system audit log
     await pool.query(
-      'INSERT INTO audit_logs (user_id, action, entity_type, entity_id, new_value) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO audit_logs (user_id, action_type, entity_type, entity_id, new_value) VALUES (?, ?, ?, ?, ?)',
       [userId, 'USER_SIGNUP', 'USER', userId, JSON.stringify({ email, role_id: roleId, department })]
     );
 
@@ -225,7 +225,7 @@ exports.login = async (req, res, next) => {
 
     // Write login log to audit log
     await pool.query(
-      'INSERT INTO audit_logs (user_id, action, entity_type, entity_id) VALUES (?, ?, ?, ?)',
+      'INSERT INTO audit_logs (user_id, action_type, entity_type, entity_id) VALUES (?, ?, ?, ?)',
       [user.id, 'USER_LOGIN', 'USER', user.id]
     );
 
@@ -274,9 +274,9 @@ exports.forgotPassword = async (req, res, next) => {
       [user.id, token, expiresAt]
     );
 
-    // Audit log
+    // Create audit log entry
     await pool.query(
-      'INSERT INTO audit_logs (user_id, action, entity_type, entity_id) VALUES (?, ?, ?, ?)',
+      'INSERT INTO audit_logs (user_id, action_type, entity_type, entity_id) VALUES (?, ?, ?, ?)',
       [user.id, 'PASSWORD_RESET_REQUESTED', 'USER', user.id]
     );
 
@@ -345,7 +345,7 @@ exports.resetPassword = async (req, res, next) => {
 
     // Audit log
     await pool.query(
-      'INSERT INTO audit_logs (user_id, action, entity_type, entity_id) VALUES (?, ?, ?, ?)',
+      'INSERT INTO audit_logs (user_id, action_type, entity_type, entity_id) VALUES (?, ?, ?, ?)',
       [tokenRecord.user_id, 'PASSWORD_RESET_SUCCESS', 'USER', tokenRecord.user_id]
     );
 

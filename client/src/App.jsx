@@ -33,7 +33,8 @@ import {
   Archive,
   Truck,
   Factory,
-  Check
+  Check,
+  Package
 } from 'lucide-react';
 
 axios.defaults.baseURL = '';
@@ -47,7 +48,7 @@ export default function App() {
 }
 
 function AppRoutes() {
-  const { currentUser, login, logout, role, loading } = useAuth();
+  const { currentUser, login, logout, role, loading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -72,27 +73,27 @@ function AppRoutes() {
     <Routes>
       <Route 
         path="/" 
-        element={currentUser ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />} 
+        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/login" 
-        element={!currentUser ? <LoginView onAuthSuccess={handleAuthSuccess} /> : <Navigate to="/dashboard" replace />} 
+        element={!isAuthenticated ? <LoginView onAuthSuccess={handleAuthSuccess} /> : <Navigate to="/dashboard" replace />} 
       />
       <Route 
         path="/admin-signup" 
-        element={!currentUser ? <AdminSignupView onAuthSuccess={handleAuthSuccess} /> : <Navigate to="/dashboard" replace />} 
+        element={!isAuthenticated ? <AdminSignupView onAuthSuccess={handleAuthSuccess} /> : <Navigate to="/dashboard" replace />} 
       />
       <Route 
         path="/user-signup" 
-        element={!currentUser ? <UserSignupView onAuthSuccess={handleAuthSuccess} /> : <Navigate to="/dashboard" replace />} 
+        element={!isAuthenticated ? <UserSignupView onAuthSuccess={handleAuthSuccess} /> : <Navigate to="/dashboard" replace />} 
       />
       <Route 
         path="/forgot-password" 
-        element={!currentUser ? <ForgotPasswordView /> : <Navigate to="/dashboard" replace />} 
+        element={!isAuthenticated ? <ForgotPasswordView /> : <Navigate to="/dashboard" replace />} 
       />
       <Route 
         path="/reset-password" 
-        element={!currentUser ? <ResetPasswordView /> : <Navigate to="/dashboard" replace />} 
+        element={!isAuthenticated ? <ResetPasswordView /> : <Navigate to="/dashboard" replace />} 
       />
       <Route 
         path="/unauthorized" 
@@ -101,11 +102,11 @@ function AppRoutes() {
       <Route 
         path="/dashboard" 
         element={
-          currentUser ? (
+          isAuthenticated ? (
             role === 'Admin' ? (
-              <AdminDashboard user={currentUser} onLogout={handleLogout} />
+              <AdminDashboard user={(currentUser && currentUser.user) ? currentUser.user : currentUser} onLogout={handleLogout} />
             ) : (
-              <DashboardView user={currentUser} onLogout={handleLogout} />
+              <DashboardView user={(currentUser && currentUser.user) ? currentUser.user : currentUser} onLogout={handleLogout} />
             )
           ) : (
             <Navigate to="/login" replace />

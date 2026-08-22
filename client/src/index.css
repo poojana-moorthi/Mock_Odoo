@@ -2623,3 +2623,152 @@ body {
   justify-content: flex-end;
   gap: 0.75rem;
 }
+
+/* ==========================================================================
+   Inventory Core & Stock Ledger Extra Styles
+   ========================================================================== */
+.summary-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1100px) {
+  .summary-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .summary-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.summary-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: var(--transition-smooth);
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.card-header-sm {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+
+.card-icon {
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.card-icon.blue { background: #eff6ff; color: #2563eb; }
+.card-icon.emerald { background: #ecfdf5; color: #059669; }
+.card-icon.amber { background: #fffbeb; color: #d97706; }
+.card-icon.violet { background: #f5f3ff; color: #7c3aed; }
+
+.card-value {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.card-subtext {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.movement-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.725rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.movement-tag.inflow {
+  background: #d1fae5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.movement-tag.outflow {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+.movement-tag.adjustment {
+  background: #e0e7ff;
+  color: #3730a3;
+  border: 1px solid #c7d2fe;
+}
+
+.change-pill {
+  font-family: monospace;
+  font-weight: 800;
+  font-size: 0.85rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+}
+
+.change-pill.pos {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.change-pill.neg {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.last-movement-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.modal-card.wide {
+  max-width: 800px;
+  width: 90%;
+}
+
+.modal-body-scroll {
+  max-height: 450px;
+  overflow-y: auto;
+  padding: 1rem 0;
+}
+
+.pagination-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-secondary.sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+}
+

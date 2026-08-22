@@ -16,7 +16,14 @@ export const normalizeRole = (roleStr) => {
 };
 
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch (e) {
+      return null;
+    }
+  });
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [loading, setLoading] = useState(true);
 
@@ -31,6 +38,7 @@ export function AuthProvider({ children }) {
 
   const login = (user, authToken) => {
     localStorage.setItem('token', authToken);
+    localStorage.setItem('user', JSON.stringify(user));
     axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
     setToken(authToken);
     setCurrentUser(user);
@@ -38,34 +46,38 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     delete axios.defaults.headers.common['Authorization'];
     setToken('');
     setCurrentUser(null);
   };
 
-  const role = currentUser ? normalizeRole(currentUser.role_name || currentUser.role) : '';
+  const effectiveUser = (currentUser && currentUser.user) ? currentUser.user : currentUser;
+  const role = effectiveUser ? normalizeRole(effectiveUser.role_name || effectiveUser.role) : '';
 
   const hasRole = (...allowedRoles) => {
-    if (!currentUser) return false;
+    if (!effectiveUser) return false;
     const normalizedAllowed = allowedRoles.map(normalizeRole);
     return normalizedAllowed.includes(role);
   };
 
   const canWrite = () => {
-    if (!currentUser) return false;
+    if (!effectiveUser) return false;
     // BusinessOwner is read-only across all modules
     return role !== 'BusinessOwner';
   };
 
+  const isAuthenticated = Boolean(effectiveUser && (effectiveUser.id || effectiveUser.email) && token);
+
   return (
     <AuthContext.Provider
       value={{
-        currentUser,
+        currentUser: effectiveUser,
         setCurrentUser,
         token,
         role,
         loading,
-        isAuthenticated: !!currentUser,
+        isAuthenticated,
         login,
         logout,
         hasRole,

@@ -1,17 +1,16 @@
 const pool = require('../config/db');
 
 /**
- * Record a physical stock movement and update product on_hand_qty in a database transaction.
- * 
- * @param {Object} params
- * @param {number} params.productId - ID of the product
- * @param {'SalesDelivery'|'PurchaseReceipt'|'ManufacturingConsume'|'ManufacturingProduce'|'ManualAdjustment'} params.movementType - Category of stock movement
- * @param {number} params.quantityChange - Signed integer (negative for outflow, positive for inflow)
- * @param {string} params.referenceType - Reference entity name (e.g., 'SalesOrder', 'PurchaseOrder', 'ManufacturingOrder', 'ManualAdjustment')
- * @param {number} params.referenceId - ID of reference entity
- * @param {Object} [existingConnection] - Optional existing DB transaction connection
+ * Record a transaction-safe stock movement in stock_ledger and update product quantities
  */
-async function recordStockMovement({ productId, movementType, quantityChange, referenceType, referenceId }, existingConnection = null) {
+async function recordStockMovement({
+  productId,
+  movementType,
+  quantityChange,
+  referenceType,
+  referenceId,
+  connection: existingConnection = null
+}) {
   const connection = existingConnection || (await pool.getConnection());
   const isSelfManagedTx = !existingConnection;
 
@@ -20,7 +19,6 @@ async function recordStockMovement({ productId, movementType, quantityChange, re
       await connection.beginTransaction();
     }
 
-    // 1. Verify product exists
     const [products] = await connection.query('SELECT id, name, on_hand_qty, reserved_qty FROM products WHERE id = ? FOR UPDATE', [productId]);
     if (products.length === 0) {
       throw new Error(`Product with ID ${productId} not found.`);
@@ -28,37 +26,39 @@ async function recordStockMovement({ productId, movementType, quantityChange, re
 
     const product = products[0];
 
-    // Optional check: warn or throw if stock would drop below 0 on outbound movement
-    const newOnHandQty = Number(product.on_hand_qty) + Number(quantityChange);
-    if (newOnHandQty < 0) {
-      throw new Error(`Insufficient stock for product '${product.name}' (ID: ${productId}). On-hand: ${product.on_hand_qty}, Requested change: ${quantityChange}`);
+    // Check if outflow movement would cause negative stock
+    if (quantityChange < 0 && Math.abs(quantityChange) > product.on_hand_qty) {
+      console.warn(`[Inventory Warning] Outflow of ${Math.abs(quantityChange)} units exceeds on-hand stock (${product.on_hand_qty}) for Product #${productId}`);
     }
 
-    // 2. Insert Stock Ledger Entry
-    const [ledgerResult] = await connection.query(
-      `INSERT INTO stock_ledger (product_id, movement_type, quantity_change, reference_type, reference_id, created_at)
-       VALUES (?, ?, ?, ?, ?, NOW())`,
-      [productId, movementType, quantityChange, referenceType || 'ManualAdjustment', referenceId || 0]
+    // Insert into stock_ledger
+    await connection.query(
+      `INSERT INTO stock_ledger (product_id, movement_type, quantity_change, reference_type, reference_id) VALUES (?, ?, ?, ?, ?)`,
+      [productId, movementType, quantityChange, referenceType, referenceId]
     );
 
-    // 3. Update Product on_hand_qty
-    await connection.query(
-      `UPDATE products SET on_hand_qty = on_hand_qty + ?, updated_at = NOW() WHERE id = ?`,
-      [quantityChange, productId]
-    );
+    // Update on_hand_qty and adjust reserved_qty for sales delivery
+    if (movementType === 'SalesDelivery') {
+      await connection.query(
+        `UPDATE products SET 
+          on_hand_qty = GREATEST(0, on_hand_qty + ?),
+          reserved_qty = GREATEST(0, reserved_qty + ?),
+          updated_at = NOW() 
+         WHERE id = ?`,
+        [quantityChange, quantityChange, productId]
+      );
+    } else {
+      await connection.query(
+        `UPDATE products SET on_hand_qty = GREATEST(0, on_hand_qty + ?), updated_at = NOW() WHERE id = ?`,
+        [quantityChange, productId]
+      );
+    }
 
     if (isSelfManagedTx) {
       await connection.commit();
     }
 
-    return {
-      success: true,
-      ledgerId: ledgerResult.insertId,
-      productId,
-      oldOnHandQty: product.on_hand_qty,
-      newOnHandQty,
-      quantityChange
-    };
+    return { success: true, productId, newOnHand: product.on_hand_qty + quantityChange };
   } catch (error) {
     if (isSelfManagedTx) {
       await connection.rollback();
@@ -73,8 +73,20 @@ async function recordStockMovement({ productId, movementType, quantityChange, re
 
 /**
  * Increment reserved_qty on a product (for order confirmations).
+ * Supports both ({ productId, quantity }, connection) and (productId, quantity, connection)
  */
-async function reserveStock({ productId, quantity }, existingConnection = null) {
+async function reserveStock(param1, param2, param3) {
+  let productId, quantity, existingConnection;
+  if (typeof param1 === 'object' && param1 !== null) {
+    productId = param1.productId;
+    quantity = param1.quantity;
+    existingConnection = param2;
+  } else {
+    productId = param1;
+    quantity = param2;
+    existingConnection = param3;
+  }
+
   const connection = existingConnection || (await pool.getConnection());
   const isSelfManagedTx = !existingConnection;
 
@@ -111,9 +123,21 @@ async function reserveStock({ productId, quantity }, existingConnection = null) 
 }
 
 /**
- * Decrement reserved_qty on a product (for order cancellations or completed consumption).
+ * Decrement reserved_qty on a product (for order cancellations).
+ * Supports both ({ productId, quantity }, connection) and (productId, quantity, connection)
  */
-async function releaseReservedStock({ productId, quantity }, existingConnection = null) {
+async function releaseReservedStock(param1, param2, param3) {
+  let productId, quantity, existingConnection;
+  if (typeof param1 === 'object' && param1 !== null) {
+    productId = param1.productId;
+    quantity = param1.quantity;
+    existingConnection = param2;
+  } else {
+    productId = param1;
+    quantity = param2;
+    existingConnection = param3;
+  }
+
   const connection = existingConnection || (await pool.getConnection());
   const isSelfManagedTx = !existingConnection;
 

@@ -1037,7 +1037,7 @@ function ResetPasswordView() {
    ========================================================================== */
 function DashboardView({ user, onLogout }) {
   const navigate = useNavigate();
-  const { role, hasRole } = useAuth();
+  const { role, hasRole, canWrite } = useAuth();
   const [systemLogs, setSystemLogs] = useState([]);
   
   useEffect(() => {
@@ -1057,138 +1057,185 @@ function DashboardView({ user, onLogout }) {
         {/* Header Bar */}
         <header className="page-header">
           <div>
-            <span className="page-breadcrumb">Workspace / Main Dashboard</span>
+            <span className="page-breadcrumb">WORKSPACE / MAIN DASHBOARD</span>
             <h1 className="page-title">
               Welcome back, {user?.full_name || 'Employee'}
             </h1>
           </div>
-          <button className="btn-secondary" onClick={onLogout} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <button className="btn-secondary" onClick={onLogout}>
             <LogOut size={16} /> Logout
           </button>
         </header>
 
         {/* Quick Module Navigation Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
+        <div className="module-nav-grid">
           {hasRole('Admin', 'InventoryManager', 'BusinessOwner', 'SalesUser', 'PurchaseUser', 'ManufacturingUser') && (
             <div 
-              className="panel-card" 
-              style={{ cursor: 'pointer', transition: 'transform 0.2s ease', borderLeft: '4px solid #4f46e5' }}
+              className="module-card" 
+              style={{ '--module-accent': '#6366f1' }}
               onClick={() => navigate('/products')}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: '#64748b' }}>CATALOG</span>
-                <Package size={22} style={{ color: '#4f46e5' }} />
+              <div>
+                <div className="module-card-header">
+                  <span className="module-tag">CATALOG</span>
+                  <div className="module-icon-badge">
+                    <Package size={22} style={{ color: '#818cf8' }} />
+                  </div>
+                </div>
+                <h3 className="module-card-title">Products</h3>
+                <p className="module-card-desc">Manage product catalog, prices, and stock balances (MTS / MTO).</p>
               </div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.35rem' }}>Products</h3>
-              <p style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.5 }}>Manage product catalog, prices, and stock balances (MTS / MTO).</p>
+              <div className="module-card-action">
+                Enter Module <ArrowRight size={14} />
+              </div>
             </div>
           )}
 
           {hasRole('Admin', 'SalesUser', 'BusinessOwner') && (
             <div 
-              className="panel-card" 
-              style={{ cursor: 'pointer', transition: 'transform 0.2s ease', borderLeft: '4px solid #059669' }}
+              className="module-card" 
+              style={{ '--module-accent': '#10b981' }}
               onClick={() => navigate('/sales')}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: '#64748b' }}>DEMAND</span>
-                <ShoppingCart size={22} style={{ color: '#059669' }} />
+              <div>
+                <div className="module-card-header">
+                  <span className="module-tag">DEMAND</span>
+                  <div className="module-icon-badge">
+                    <ShoppingCart size={22} style={{ color: '#34d399' }} />
+                  </div>
+                </div>
+                <h3 className="module-card-title">Sales Orders</h3>
+                <p className="module-card-desc">Manage customer orders, reservations, and dispatch statuses.</p>
               </div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.35rem' }}>Sales Orders</h3>
-              <p style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.5 }}>Manage customer orders, reservations, and dispatch statuses.</p>
+              <div className="module-card-action">
+                Enter Module <ArrowRight size={14} />
+              </div>
             </div>
           )}
 
           {hasRole('Admin', 'PurchaseUser', 'BusinessOwner') && (
             <div 
-              className="panel-card" 
-              style={{ cursor: 'pointer', transition: 'transform 0.2s ease', borderLeft: '4px solid #d97706' }}
+              className="module-card" 
+              style={{ '--module-accent': '#f59e0b' }}
               onClick={() => navigate('/purchase')}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: '#64748b' }}>REPLENISHMENT</span>
-                <Truck size={22} style={{ color: '#d97706' }} />
+              <div>
+                <div className="module-card-header">
+                  <span className="module-tag">REPLENISHMENT</span>
+                  <div className="module-icon-badge">
+                    <Truck size={22} style={{ color: '#fbbf24' }} />
+                  </div>
+                </div>
+                <h3 className="module-card-title">Purchase Orders</h3>
+                <p className="module-card-desc">Manage vendor orders, cost prices, and inbound stock receipts.</p>
               </div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.35rem' }}>Purchase Orders</h3>
-              <p style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.5 }}>Manage vendor orders, cost prices, and inbound stock receipts.</p>
+              <div className="module-card-action">
+                Enter Module <ArrowRight size={14} />
+              </div>
             </div>
           )}
 
           {hasRole('Admin', 'ManufacturingUser', 'BusinessOwner') && (
             <div 
-              className="panel-card" 
-              style={{ cursor: 'pointer', transition: 'transform 0.2s ease', borderLeft: '4px solid #2563eb' }}
+              className="module-card" 
+              style={{ '--module-accent': '#3b82f6' }}
               onClick={() => navigate('/manufacturing')}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: '#64748b' }}>PRODUCTION</span>
-                <Factory size={22} style={{ color: '#2563eb' }} />
+              <div>
+                <div className="module-card-header">
+                  <span className="module-tag">PRODUCTION</span>
+                  <div className="module-icon-badge">
+                    <Factory size={22} style={{ color: '#60a5fa' }} />
+                  </div>
+                </div>
+                <h3 className="module-card-title">Manufacturing</h3>
+                <p className="module-card-desc">Manage BoM structures, Manufacturing Orders, and Work Centers.</p>
               </div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.35rem' }}>Manufacturing</h3>
-              <p style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.5 }}>Manage BoM structures, Manufacturing Orders, and Work Centers.</p>
+              <div className="module-card-action">
+                Enter Module <ArrowRight size={14} />
+              </div>
             </div>
           )}
         </div>
 
-        <div className="grid-2col" style={{ marginTop: '1rem' }}>
+        <div className="grid-2col">
           {/* User Details */}
           <div className="panel-card">
             <h3 className="panel-title">
-              <User size={18} style={{ color: 'var(--primary)' }} /> Profile Context
+              <User size={18} style={{ color: '#818cf8' }} /> Profile Context
             </h3>
             
-            <div className="info-item">
-              <span className="info-label">Full Name</span>
-              <span className="info-value">{user?.full_name || 'User'}</span>
+            <div className="info-row">
+              <div className="info-label-group">
+                <User size={16} />
+                <span>Full Name</span>
+              </div>
+              <span className="info-val-text">{user?.full_name || 'User'}</span>
             </div>
             
-            <div className="info-item">
-              <span className="info-label">Email Context</span>
-              <span className="info-value">{user?.email}</span>
+            <div className="info-row">
+              <div className="info-label-group">
+                <Mail size={16} />
+                <span>Email Address</span>
+              </div>
+              <span className="info-val-text">{user?.email || 'N/A'}</span>
             </div>
 
-            <div className="info-item">
-              <span className="info-label">Department</span>
-              <span className="info-value">{user?.department || 'N/A'}</span>
+            <div className="info-row">
+              <div className="info-label-group">
+                <Building size={16} />
+                <span>Department</span>
+              </div>
+              <span className="info-val-text">{user?.department || 'N/A'}</span>
             </div>
 
-            <div className="info-item">
-              <span className="info-label">Role Context</span>
-              <span className="info-value font-bold" style={{ color: '#4f46e5' }}>
-                {role || user?.role_name}
-              </span>
+            <div className="info-row">
+              <div className="info-label-group">
+                <Shield size={16} />
+                <span>Assigned Role</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span className="info-val-text" style={{ color: '#818cf8' }}>
+                  {role || user?.role_name}
+                </span>
+                {!canWrite() && (
+                  <span style={{ fontSize: '0.7rem', background: 'rgba(239,68,68,0.2)', color: '#f87171', border: '1px solid rgba(239,68,68,0.4)', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>
+                    Read-Only
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
           {/* System Security Logs */}
           <div className="panel-card">
             <h3 className="panel-title">
-              <Activity size={18} style={{ color: 'var(--primary)' }} /> Live Security Logs
+              <Activity size={18} style={{ color: '#818cf8' }} /> Live Security Logs
             </h3>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {systemLogs.map(log => (
                 <div 
                   key={log.id} 
                   style={{ 
-                    padding: '0.85rem', 
-                    background: '#f8fafc', 
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '10px',
+                    padding: '0.9rem 1.15rem', 
+                    background: 'rgba(255, 255, 255, 0.03)', 
+                    border: '1px solid rgba(255, 255, 255, 0.06)',
+                    borderRadius: '12px',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center'
                   }}
                 >
                   <div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#4f46e5', letterSpacing: '0.05em' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#818cf8', letterSpacing: '0.05em' }}>
                       {log.action}
                     </div>
-                    <div style={{ fontSize: '0.85rem', color: '#334155', marginTop: '0.2rem' }}>
+                    <div style={{ fontSize: '0.85rem', color: '#cbd5e1', marginTop: '0.2rem' }}>
                       {log.details}
                     </div>
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                  <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>
                     {log.time}
                   </div>
                 </div>

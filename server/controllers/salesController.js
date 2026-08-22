@@ -1,5 +1,5 @@
 const salesService = require('../services/salesService');
-const { success, error } = require('../utils/apiResponse');
+const { success, error } = require('../utils/response');
 
 /**
  * GET /api/sales

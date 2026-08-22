@@ -184,13 +184,17 @@ exports.login = async (req, res, next) => {
       return error(res, 'Email, Password, and User Type are required', 400);
     }
 
-    // Query user by email or login_id
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const cleanPassword = (password || '').trim();
+    const loginHandle = cleanEmail.includes('@') ? cleanEmail.split('@')[0] : cleanEmail;
+
+    // Query user by email or login_id (case-insensitive & trimmed)
     const [rows] = await pool.query(
       `SELECT u.id, u.full_name, u.login_id, u.email, u.password_hash, u.department, u.status, r.role_name
        FROM users u
        JOIN roles r ON u.role_id = r.id
-       WHERE u.email = ? OR u.login_id = ?`,
-      [email, email]
+       WHERE LOWER(u.email) = ? OR LOWER(u.login_id) = ? OR LOWER(u.login_id) = ?`,
+      [cleanEmail, cleanEmail, loginHandle]
     );
 
     if (rows.length === 0) {
@@ -218,7 +222,7 @@ exports.login = async (req, res, next) => {
     }
 
     // Verify password
-    const isPasswordCorrect = await comparePassword(password, user.password_hash);
+    const isPasswordCorrect = await comparePassword(cleanPassword, user.password_hash);
     if (!isPasswordCorrect) {
       return error(res, 'Invalid credentials', 401);
     }

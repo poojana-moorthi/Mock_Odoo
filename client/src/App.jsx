@@ -209,8 +209,11 @@ function LoginView({ onAuthSuccess }) {
     setErrorMsg('');
     setLoading(true);
 
+    const cleanEmail = email.trim();
+    const cleanPassword = password.trim();
+
     try {
-      const response = await axios.post('/api/auth/login', { email, password, userType });
+      const response = await axios.post('/api/auth/login', { email: cleanEmail, password: cleanPassword, userType });
       if (response.data?.success) {
         const { user, token } = response.data.data;
         onAuthSuccess(user, token);

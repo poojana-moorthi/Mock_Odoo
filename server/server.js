@@ -63,8 +63,8 @@ app.use('/api', erpRoutes);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, async () => {
-  console.log(`[Server] Auth Server running on port ${PORT}`);
+server.listen(PORT, '0.0.0.0', async () => {
+  console.log(`[Server] Auth Server running on http://127.0.0.1:${PORT}`);
   try {
     await runMigrations();
   } catch (err) {

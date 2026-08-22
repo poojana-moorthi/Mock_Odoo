@@ -305,7 +305,7 @@ exports.deleteProduct = async (req, res, next) => {
     }
 
     // 4. Check references in bom or bom_components
-    const [bomRefs] = await pool.query('SELECT COUNT(*) AS count FROM bom WHERE finished_product_id = ?', [productId]);
+    const [bomRefs] = await pool.query('SELECT COUNT(*) AS count FROM bom WHERE product_id = ?', [productId]);
     if (bomRefs[0].count > 0) {
       return error(res, `Cannot delete product '${existing[0].name}'. It is linked as the finished product in a Bill of Materials.`, 400);
     }

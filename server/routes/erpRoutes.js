@@ -9,15 +9,14 @@ const salesController = require('../controllers/salesController');
 // All routes require JWT authentication
 router.use(protect);
 
-// 1. Products Module Routes
-// Admin, InventoryManager, BusinessOwner, SalesUser, PurchaseUser, ManufacturingUser
+// 1. Products Module Routes (All roles can view, add, and edit products per requirement PDF)
 router.route('/products')
   .get(requireRole('Admin', 'InventoryManager', 'BusinessOwner', 'SalesUser', 'PurchaseUser', 'ManufacturingUser'), productController.getAllProducts)
-  .post(requireRole('Admin', 'InventoryManager', 'BusinessOwner', 'SalesUser'), productController.createProduct);
+  .post(requireRole('Admin', 'InventoryManager', 'BusinessOwner', 'SalesUser', 'PurchaseUser', 'ManufacturingUser'), productController.createProduct);
 
 router.route('/products/:id')
   .get(requireRole('Admin', 'InventoryManager', 'BusinessOwner', 'SalesUser', 'PurchaseUser', 'ManufacturingUser'), productController.getProductById)
-  .put(requireRole('Admin', 'InventoryManager', 'BusinessOwner', 'SalesUser'), productController.updateProduct)
+  .put(requireRole('Admin', 'InventoryManager', 'BusinessOwner', 'SalesUser', 'PurchaseUser', 'ManufacturingUser'), productController.updateProduct)
   .delete(requireRole('Admin', 'InventoryManager'), productController.deleteProduct);
 
 // Helper Vendors Route for Product Form Vendor Dropdown
@@ -25,7 +24,6 @@ router.route('/vendors')
   .get(requireRole('Admin', 'InventoryManager', 'BusinessOwner', 'SalesUser', 'PurchaseUser', 'ManufacturingUser'), productController.getAllVendors);
 
 // 2. Sales Module Routes (Phase 5)
-// Admin, SalesUser, BusinessOwner
 router.route('/sales')
   .get(requireRole('Admin', 'SalesUser', 'BusinessOwner'), salesController.getSalesOrders)
   .post(requireRole('Admin', 'SalesUser', 'BusinessOwner'), salesController.createSalesOrder);

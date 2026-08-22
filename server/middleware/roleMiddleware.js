@@ -30,22 +30,13 @@ exports.requireRole = (...allowedRoles) => {
 
     const userRole = normalizeRole(req.user.role_name || req.user.role);
 
-    // 1. Check if user's role is in allowed roles list
+    // Check if user's role is in allowed roles list
     const isRoleAllowed = normalizedAllowed.includes(userRole);
 
     if (!isRoleAllowed) {
       return error(
         res,
         `Forbidden: Role "${req.user.role_name || userRole}" is not authorized to access this route`,
-        403
-      );
-    }
-
-    // 2. Special BusinessOwner Rule: Read-Only (GET) access only
-    if (userRole === 'BusinessOwner' && req.method !== 'GET') {
-      return error(
-        res,
-        'Forbidden: BusinessOwner has read-only access to module resources',
         403
       );
     }

@@ -1072,14 +1072,14 @@ function DashboardView({ user, onLogout }) {
           {hasRole('Admin', 'InventoryManager', 'BusinessOwner', 'SalesUser', 'PurchaseUser', 'ManufacturingUser') && (
             <div 
               className="module-card" 
-              style={{ '--module-accent': '#6366f1' }}
+              style={{ '--module-accent': '#4f46e5' }}
               onClick={() => navigate('/products')}
             >
               <div>
                 <div className="module-card-header">
                   <span className="module-tag">CATALOG</span>
                   <div className="module-icon-badge">
-                    <Package size={22} style={{ color: '#818cf8' }} />
+                    <Package size={22} style={{ color: '#4f46e5' }} />
                   </div>
                 </div>
                 <h3 className="module-card-title">Products</h3>
@@ -1094,14 +1094,14 @@ function DashboardView({ user, onLogout }) {
           {hasRole('Admin', 'SalesUser', 'BusinessOwner') && (
             <div 
               className="module-card" 
-              style={{ '--module-accent': '#10b981' }}
+              style={{ '--module-accent': '#059669' }}
               onClick={() => navigate('/sales')}
             >
               <div>
                 <div className="module-card-header">
                   <span className="module-tag">DEMAND</span>
                   <div className="module-icon-badge">
-                    <ShoppingCart size={22} style={{ color: '#34d399' }} />
+                    <ShoppingCart size={22} style={{ color: '#059669' }} />
                   </div>
                 </div>
                 <h3 className="module-card-title">Sales Orders</h3>
@@ -1116,14 +1116,14 @@ function DashboardView({ user, onLogout }) {
           {hasRole('Admin', 'PurchaseUser', 'BusinessOwner') && (
             <div 
               className="module-card" 
-              style={{ '--module-accent': '#f59e0b' }}
+              style={{ '--module-accent': '#d97706' }}
               onClick={() => navigate('/purchase')}
             >
               <div>
                 <div className="module-card-header">
                   <span className="module-tag">REPLENISHMENT</span>
                   <div className="module-icon-badge">
-                    <Truck size={22} style={{ color: '#fbbf24' }} />
+                    <Truck size={22} style={{ color: '#d97706' }} />
                   </div>
                 </div>
                 <h3 className="module-card-title">Purchase Orders</h3>
@@ -1138,14 +1138,14 @@ function DashboardView({ user, onLogout }) {
           {hasRole('Admin', 'ManufacturingUser', 'BusinessOwner') && (
             <div 
               className="module-card" 
-              style={{ '--module-accent': '#3b82f6' }}
+              style={{ '--module-accent': '#2563eb' }}
               onClick={() => navigate('/manufacturing')}
             >
               <div>
                 <div className="module-card-header">
                   <span className="module-tag">PRODUCTION</span>
                   <div className="module-icon-badge">
-                    <Factory size={22} style={{ color: '#60a5fa' }} />
+                    <Factory size={22} style={{ color: '#2563eb' }} />
                   </div>
                 </div>
                 <h3 className="module-card-title">Manufacturing</h3>
@@ -1162,7 +1162,7 @@ function DashboardView({ user, onLogout }) {
           {/* User Details */}
           <div className="panel-card">
             <h3 className="panel-title">
-              <User size={18} style={{ color: '#818cf8' }} /> Profile Context
+              <User size={18} style={{ color: '#4f46e5' }} /> Profile Context
             </h3>
             
             <div className="info-row">
@@ -1195,11 +1195,11 @@ function DashboardView({ user, onLogout }) {
                 <span>Assigned Role</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span className="info-val-text" style={{ color: '#818cf8' }}>
+                <span className="info-val-text" style={{ color: '#4f46e5', fontWeight: 800 }}>
                   {role || user?.role_name}
                 </span>
                 {!canWrite() && (
-                  <span style={{ fontSize: '0.7rem', background: 'rgba(239,68,68,0.2)', color: '#f87171', border: '1px solid rgba(239,68,68,0.4)', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>
+                  <span style={{ fontSize: '0.7rem', background: '#fef2f2', color: '#dc2626', border: '1px solid #fca5a5', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>
                     Read-Only
                   </span>
                 )}
@@ -1210,7 +1210,7 @@ function DashboardView({ user, onLogout }) {
           {/* System Security Logs */}
           <div className="panel-card">
             <h3 className="panel-title">
-              <Activity size={18} style={{ color: '#818cf8' }} /> Live Security Logs
+              <Activity size={18} style={{ color: '#4f46e5' }} /> Live Security Logs
             </h3>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -1219,8 +1219,8 @@ function DashboardView({ user, onLogout }) {
                   key={log.id} 
                   style={{ 
                     padding: '0.9rem 1.15rem', 
-                    background: 'rgba(255, 255, 255, 0.03)', 
-                    border: '1px solid rgba(255, 255, 255, 0.06)',
+                    background: '#f8fafc', 
+                    border: '1px solid #e2e8f0',
                     borderRadius: '12px',
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -1228,14 +1228,14 @@ function DashboardView({ user, onLogout }) {
                   }}
                 >
                   <div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#818cf8', letterSpacing: '0.05em' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#4f46e5', letterSpacing: '0.05em' }}>
                       {log.action}
                     </div>
-                    <div style={{ fontSize: '0.85rem', color: '#cbd5e1', marginTop: '0.2rem' }}>
+                    <div style={{ fontSize: '0.85rem', color: '#334155', marginTop: '0.2rem' }}>
                       {log.details}
                     </div>
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>
                     {log.time}
                   </div>
                 </div>

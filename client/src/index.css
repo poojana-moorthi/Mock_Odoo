@@ -2776,13 +2776,13 @@ body {
 }
 
 /* ==========================================================================
-   Dark Workspace Theme System (Matching Login Page Aesthetic)
+   Light Workspace Theme System (Matching Login Form Aesthetic)
    ========================================================================== */
 .erp-page-layout {
   display: flex;
   min-height: 100vh;
-  background: #0b0f19;
-  color: #f8fafc;
+  background: #f8fafc;
+  color: #0f172a;
   font-family: var(--font-family);
 }
 
@@ -2793,9 +2793,7 @@ body {
   flex-direction: column;
   gap: 2rem;
   overflow-y: auto;
-  background: radial-gradient(circle at top right, rgba(79, 70, 229, 0.08), transparent 40%),
-              radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.05), transparent 40%),
-              #0b0f19;
+  background: #f8fafc;
 }
 
 .page-header {
@@ -2803,7 +2801,7 @@ body {
   align-items: center;
   justify-content: space-between;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .page-breadcrumb {
@@ -2811,49 +2809,44 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #818cf8;
+  color: #64748b;
 }
 
 .page-title {
   font-size: 2rem;
   font-weight: 800;
-  color: #ffffff;
-  letter-spacing: -0.02em;
+  color: #0f172a;
+  letter-spacing: -0.025em;
   margin-top: 0.25rem;
-  background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
-/* Glassmorphic Panel Cards */
+/* Light Elevation Cards */
 .panel-card {
-  background: rgba(17, 24, 39, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 16px;
   padding: 1.75rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
   position: relative;
   overflow: hidden;
 }
 
 .panel-card:hover {
-  border-color: rgba(99, 102, 241, 0.3);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35), 0 0 20px rgba(99, 102, 241, 0.15);
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
 }
 
 .panel-title {
   font-size: 1.15rem;
   font-weight: 800;
-  color: #ffffff;
+  color: #0f172a;
   display: flex;
   align-items: center;
   gap: 0.65rem;
   margin-bottom: 1.25rem;
   padding-bottom: 0.85rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid #f1f5f9;
 }
 
 /* Quick Module Navigation Cards */
@@ -2864,9 +2857,8 @@ body {
 }
 
 .module-card {
-  background: rgba(17, 24, 39, 0.75);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 16px;
   padding: 1.75rem;
   cursor: pointer;
@@ -2876,6 +2868,7 @@ body {
   justify-content: space-between;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
 }
 
 .module-card::before {
@@ -2884,15 +2877,14 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  height: 3px;
+  height: 4px;
   background: var(--module-accent, #4f46e5);
-  transition: opacity 0.3s ease;
 }
 
 .module-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(255, 255, 255, 0.18);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(99, 102, 241, 0.2);
+  border-color: #cbd5e1;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.1);
 }
 
 .module-card-header {
@@ -2903,11 +2895,11 @@ body {
 }
 
 .module-tag {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #94a3b8;
+  color: #64748b;
 }
 
 .module-icon-badge {
@@ -2917,34 +2909,34 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
   transition: all 0.3s ease;
 }
 
 .module-card:hover .module-icon-badge {
   transform: scale(1.1);
-  background: rgba(255, 255, 255, 0.1);
+  background: #e2e8f0;
 }
 
 .module-card-title {
   font-size: 1.25rem;
   font-weight: 800;
-  color: #ffffff;
+  color: #0f172a;
   margin-bottom: 0.5rem;
 }
 
 .module-card-desc {
   font-size: 0.85rem;
-  color: #94a3b8;
-  line-height: 1.5;
+  color: #64748b;
+  line-height: 1.55;
   margin-bottom: 1.5rem;
 }
 
 .module-card-action {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #818cf8;
+  color: #4f46e5;
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -2953,7 +2945,7 @@ body {
 
 .module-card:hover .module-card-action {
   gap: 0.75rem;
-  color: #a5b4fc;
+  color: #4338ca;
 }
 
 /* Info Grid Layout */
@@ -2975,8 +2967,8 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 0.85rem 1.15rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
   margin-bottom: 0.75rem;
 }
@@ -2985,7 +2977,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  color: #94a3b8;
+  color: #64748b;
   font-size: 0.85rem;
   font-weight: 600;
 }
@@ -2993,14 +2985,14 @@ body {
 .info-val-text {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #ffffff;
+  color: #0f172a;
 }
 
-/* Secondary Button Dark Mode */
+/* Secondary Button Light Mode */
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #e2e8f0;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
   padding: 0.65rem 1.25rem;
   border-radius: 10px;
   font-family: var(--font-family);
@@ -3011,12 +3003,13 @@ body {
   align-items: center;
   gap: 0.5rem;
   transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
 }
 
 .btn-secondary:hover {
-  background: rgba(239, 68, 68, 0.2);
-  color: #f87171;
-  border-color: rgba(239, 68, 68, 0.4);
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fca5a5;
   transform: translateY(-1px);
 }
 
